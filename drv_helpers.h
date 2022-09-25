@@ -78,6 +78,9 @@ struct lru_entry *lru_find(struct lru *lru, bool (*eq)(struct lru_entry *e, void
 void lru_insert(struct lru *lru, struct lru_entry *entry);
 void lru_init(struct lru *lru, int max);
 
+int drv_use_flags_to_string(int use_flags, char *out, int max_len);
+int drv_use_flags_to_string_short(int use_flags, char *out, int max_len);
+
 #ifdef __cplusplus
 }
 #endif
