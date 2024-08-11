@@ -41,6 +41,10 @@ endif
 ifdef DRV_VMWGFX
 	CFLAGS += $(shell $(PKG_CONFIG) --cflags libdrm)
 endif
+# this is not a full driver but a helper
+ifdef DRV_HBM_HELPER
+	LDLIBS += -lhbm_minigbm
+endif
 
 CPPFLAGS += $(PC_CFLAGS)
 LDLIBS += $(PC_LIBS)
