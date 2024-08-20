@@ -759,4 +759,179 @@ bool hbm_sync(struct hbm *hbm, struct hbm_resource *res, const struct mapping *m
 	return ret;
 }
 
+#ifdef DRV_AMDGPU
+
+#include "dri.h"
+#include <string.h>
+#include <sys/mman.h>
+
+void *dri_dlopen(const char *dri_so_path)
+{
+	return NULL;
+}
+
+void dri_dlclose(void *dri_so_handle)
+{
+}
+
+struct dri_driver *dri_init(struct driver *drv, const char *dri_so_path, const char *driver_suffix)
+{
+	return (struct dri_driver *)hbm_create(drv_get_fd(drv));
+}
+
+void dri_close(struct dri_driver *dri)
+{
+	struct hbm *hbm = (struct hbm *)dri;
+	hbm_destroy(hbm);
+}
+
+size_t dri_num_planes_from_modifier(struct dri_driver *dri, uint32_t format, uint64_t modifier)
+{
+	struct hbm *hbm = (struct hbm *)dri;
+
+	/* amdgpu_import_bo can call this with DRM_FORMAT_MOD_INVALID */
+	return modifier == DRM_FORMAT_MOD_INVALID
+		   ? drv_num_planes_from_format(format)
+		   : hbm_device_get_plane_count(hbm->device, format, modifier);
+}
+
+bool dri_query_modifiers(struct dri_driver *dri, uint32_t format, int max, uint64_t *modifiers,
+			 int *count)
+{
+	struct hbm *hbm = (struct hbm *)dri;
+
+	/* we have to guess the use flags */
+	const uint64_t use_flags = BO_USE_RENDERING;
+
+	struct hbm_description desc;
+	init_description(hbm, format, DRM_FORMAT_MOD_INVALID, use_flags, &desc);
+
+	/* if the device supports DRM_FORMAT_MOD_INVALID, it lacks explicit modifier support */
+	if (hbm_device_has_modifier(hbm->device, &desc, DRM_FORMAT_MOD_INVALID))
+		return false;
+
+	*count = hbm_device_get_modifiers(hbm->device, &desc, max, modifiers);
+	return *count >= 0 ? true : false;
+}
+
+int dri_bo_create(struct dri_driver *dri, struct bo *bo, uint32_t width, uint32_t height,
+		  uint32_t format, uint64_t use_flags)
+{
+	return dri_bo_create_with_modifiers(dri, bo, width, height, format, use_flags, NULL, 0);
+}
+
+int dri_bo_create_with_modifiers(struct dri_driver *dri, struct bo *bo, uint32_t width,
+				 uint32_t height, uint32_t format, uint64_t use_flags,
+				 const uint64_t *modifiers, uint32_t modifier_count)
+{
+	struct hbm *hbm = (struct hbm *)dri;
+
+	/* if there is no use flags, we have to guess (should we include USE_SW?) */
+	if (!use_flags)
+		use_flags = BO_USE_TEXTURE;
+
+	bo->priv = hbm_allocate(hbm, width, height, format, use_flags, modifiers, modifier_count,
+				&bo->meta);
+	if (!bo->priv)
+		return -1;
+
+	/* TODO if there is no USE_SW, we can in theory destroy bo->priv after
+	 * re-import
+	 */
+	bo->handle.u32 = hbm_reimport_to_driver(hbm, bo->priv, NULL);
+	if (!bo->handle.u32) {
+		hbm_free(hbm, bo->priv);
+		return -1;
+	}
+
+	return 0;
+}
+
+int dri_bo_import(struct dri_driver *dri, struct bo *bo, struct drv_import_fd_data *data)
+{
+	struct hbm *hbm = (struct hbm *)dri;
+
+	/* chrome's ProtectedBufferManager imports dma-bufs with invalid
+	 * parameters, only to get their unique gem handles.  hbm rightfully
+	 * rejects them so we have to work around.
+	 */
+	if (data->format_modifier == DRM_FORMAT_MOD_INVALID && !data->strides[0])
+		return drv_prime_bo_import(bo, data);
+
+	/* TODO if there is no USE_SW, we can in theory skip bo->priv */
+	bo->priv = hbm_import(hbm, data, &bo->meta);
+	if (!bo->priv)
+		return -1;
+
+	bo->handle.u32 = hbm_reimport_to_driver(hbm, bo->priv, data);
+	if (!bo->handle.u32) {
+		hbm_free(hbm, bo->priv);
+		return -1;
+	}
+
+	return 0;
+}
+
+int dri_bo_release(struct dri_driver *dri, struct bo *bo)
+{
+	struct hbm *hbm = (struct hbm *)dri;
+	hbm_free(hbm, bo->priv);
+	return 0;
+}
+
+int dri_bo_destroy(struct dri_driver *dri, struct bo *bo)
+{
+	drv_gem_close(bo->drv, bo->handle.u32);
+	return 0;
+}
+
+void *dri_bo_map(struct dri_driver *dri, struct bo *bo, struct vma *vma, size_t plane,
+		 uint32_t map_flags)
+{
+	struct hbm *hbm = (struct hbm *)dri;
+
+	assert(!plane);
+
+	void *ptr = hbm_map(hbm, bo->priv, vma, map_flags);
+	/* gbm returns NULL but minigbm returns MAP_FAILED on errors */
+	if (!ptr)
+		return MAP_FAILED;
+
+	if (map_flags & BO_MAP_READ) {
+		const struct mapping mapping = {
+			.vma = vma,
+			.rect = {
+				.width = bo->meta.width,
+				.height = bo->meta.height,
+			},
+		};
+		const bool flush = false;
+		hbm_sync(hbm, bo->priv, &mapping, 0, flush);
+	}
+
+	return ptr;
+}
+
+int dri_bo_unmap(struct dri_driver *dri, struct bo *bo, struct vma *vma)
+{
+	struct hbm *hbm = (struct hbm *)dri;
+
+	if (vma->map_flags & BO_MAP_WRITE) {
+		const struct mapping mapping = {
+			.vma = vma,
+			.rect = {
+				.width = bo->meta.width,
+				.height = bo->meta.height,
+			},
+		};
+		const bool flush = true;
+		hbm_sync(hbm, bo->priv, &mapping, 0, flush);
+	}
+
+	hbm_unmap(hbm, bo->priv, vma);
+	return 0;
+}
+
+#endif /* DRV_AMDGPU */
+
 #endif /* DRV_HBM_HELPER */
