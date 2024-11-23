@@ -204,6 +204,8 @@ static int detect_device_info(unsigned int detect_flags, int fd, struct gbm_devi
 	} else if (strncmp("udl", version->name, version->name_len) == 0) {
 		info->dev_type_flags |=
 		    GBM_DEV_TYPE_FLAG_DISPLAY | GBM_DEV_TYPE_FLAG_USB | GBM_DEV_TYPE_FLAG_BLOCKED;
+	} else if (strncmp("vmwgfx", version->name, version->name_len) == 0) {
+		info->dev_type_flags |= GBM_DEV_TYPE_FLAG_DISPLAY | GBM_DEV_TYPE_FLAG_3D;
 	}
 
 done:
