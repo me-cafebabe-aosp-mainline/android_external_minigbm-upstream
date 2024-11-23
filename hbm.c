@@ -65,7 +65,7 @@ struct hbm_resource {
 
 static uint32_t pick_staging_memory_type(struct hbm *hbm);
 
-static void hbm_log(int32_t lv, const char *msg, void *data)
+static void hbm_log(enum hbm_log_level lv, const char *msg, void *data)
 {
 	enum drv_log_level drv_lv;
 	switch (lv) {
