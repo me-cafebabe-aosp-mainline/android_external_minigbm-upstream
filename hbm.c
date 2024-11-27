@@ -789,10 +789,18 @@ size_t dri_num_planes_from_modifier(struct dri_driver *dri, uint32_t format, uin
 {
 	struct hbm *hbm = (struct hbm *)dri;
 
-	/* amdgpu_import_bo can call this with DRM_FORMAT_MOD_INVALID */
-	return modifier == DRM_FORMAT_MOD_INVALID
-		   ? drv_num_planes_from_format(format)
-		   : hbm_device_get_plane_count(hbm->device, format, modifier);
+	uint32_t count = hbm_device_get_plane_count(hbm->device, format, modifier);
+
+	/* gbm_bo_import can call this with an invalid format, such as
+	 * DRM_FORMAT_YVU420_ANDROID.  amdgpu_import_bo can call this with
+	 * DRM_FORMAT_MOD_INVALID.  Fallback to drv_num_planes_from_format
+	 * when hbm_device_get_plane_count does not recognize the
+	 * format/modifier.
+	 */
+	if (!count && (modifier == DRM_FORMAT_MOD_LINEAR || modifier == DRM_FORMAT_MOD_INVALID))
+		count = drv_num_planes_from_format(format);
+
+	return count;
 }
 
 bool dri_query_modifiers(struct dri_driver *dri, uint32_t format, int max, uint64_t *modifiers,
