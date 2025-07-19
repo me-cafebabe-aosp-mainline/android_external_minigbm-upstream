@@ -50,6 +50,7 @@ filegroup {
         "virtgpu.c",
         "virtgpu_cross_domain.c",
         "virtgpu_virgl.c",
+        "vmwgfx.c",
         "xe.c",
     ],
 }

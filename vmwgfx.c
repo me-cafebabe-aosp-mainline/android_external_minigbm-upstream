@@ -74,7 +74,7 @@ static uint64_t get_map_handle(struct bo_metadata *meta)
 	return (map_handle << 32) & meta->blob_id;
 }
 
-static const uint32_t drm_format_to_svga_format(uint32_t format)
+static uint32_t drm_format_to_svga_format(uint32_t format)
 {
 	switch (format) {
 	case DRM_FORMAT_R8:
