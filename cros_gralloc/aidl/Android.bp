@@ -23,11 +23,10 @@ package {
     default_applicable_licenses: ["external_minigbm_license"],
 }
 
-cc_binary {
-    name: "android.hardware.graphics.allocator-service.minigbm",
+cc_defaults {
+    name: "defaults_android.hardware.graphics.allocator-service.minigbm",
     defaults: ["minigbm_cros_gralloc_defaults"],
     relative_install_path: "hw",
-    init_rc: ["allocator.rc"],
     vintf_fragments: ["allocator.xml"],
     vendor: true,
     shared_libs: [
@@ -50,9 +49,38 @@ cc_binary {
     ],
 }
 
+cc_binary {
+    name: "android.hardware.graphics.allocator-service.minigbm",
+    defaults: ["defaults_android.hardware.graphics.allocator-service.minigbm"],
+    init_rc: ["allocator.rc"],
+    cflags: [
+        "-DIMAPPER_LIBRARY_SUFFIX=\"minigbm\"",
+    ],
+    shared_libs: [
+        "libminigbm_gralloc",
+    ],
+}
+
+cc_binary {
+    name: "android.hardware.graphics.allocator-service.minigbm_generic_x86",
+    defaults: ["defaults_android.hardware.graphics.allocator-service.minigbm"],
+    init_rc: ["allocator.generic_x86.rc"],
+    cflags: [
+        "-DIMAPPER_LIBRARY_SUFFIX=\"minigbm_generic_x86\"",
+    ],
+    shared_libs: [
+        "libminigbm_gralloc_generic_x86",
+    ],
+}
+
 filegroup {
     name: "allocator.minigbm.rc",
     srcs: ["allocator.rc"]
+}
+
+filegroup {
+    name: "allocator.minigbm_generic_x86.rc",
+    srcs: ["allocator.generic_x86.rc"]
 }
 
 prebuilt_etc {

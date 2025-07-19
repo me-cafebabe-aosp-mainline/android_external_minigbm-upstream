@@ -23,13 +23,11 @@ package {
     default_applicable_licenses: ["external_minigbm_license"],
 }
 
-cc_library_shared {
-    name: "mapper.minigbm",
+cc_defaults {
+    name: "defaults_mapper.minigbm",
     defaults: ["minigbm_gralloc4_common_defaults"],
-    vintf_fragments: ["mapper.minigbm.xml"],
     shared_libs: [
         "android.hardware.graphics.allocator-V2-ndk",
-        "libminigbm_gralloc",
     ],
     header_libs: [
         "libbase_headers",
@@ -43,9 +41,34 @@ cc_library_shared {
     cpp_std: "c++20",
 }
 
+cc_library_shared {
+    name: "mapper.minigbm",
+    defaults: ["defaults_mapper.minigbm"],
+    shared_libs: [
+        "libminigbm_gralloc",
+    ],
+    vintf_fragments: ["mapper.minigbm.xml"],
+}
+
+cc_library_shared {
+    name: "mapper.minigbm_generic_x86",
+    defaults: ["defaults_mapper.minigbm"],
+    shared_libs: [
+        "libminigbm_gralloc_generic_x86",
+    ],
+    vintf_fragments: ["mapper.minigbm_generic_x86.xml"],
+}
+
 prebuilt_etc {
     name: "mapper.minigbm.xml",
     src: "mapper.minigbm.xml",
+    sub_dir: "vintf",
+    installable: false,
+}
+
+prebuilt_etc {
+    name: "mapper.minigbm_generic_x86.xml",
+    src: "mapper.minigbm_generic_x86.xml",
     sub_dir: "vintf",
     installable: false,
 }

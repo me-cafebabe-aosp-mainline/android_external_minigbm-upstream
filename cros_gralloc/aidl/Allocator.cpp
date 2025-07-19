@@ -198,7 +198,7 @@ ndk::ScopedAStatus Allocator::isSupported(const BufferDescriptorInfo& descriptor
 }
 
 ndk::ScopedAStatus Allocator::getIMapperLibrarySuffix(std::string* outResult) {
-    *outResult = "minigbm";
+    *outResult = IMAPPER_LIBRARY_SUFFIX;
     return ndk::ScopedAStatus::ok();
 }
 
