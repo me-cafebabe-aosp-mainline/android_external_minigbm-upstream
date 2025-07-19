@@ -38,6 +38,7 @@ filegroup {
     srcs: [
         "amdgpu.c",
         "backend_mock.c",
+        "dri.c",
         "drv.c",
         "drv_array_helpers.c",
         "drv_helpers.c",
@@ -109,6 +110,15 @@ cc_defaults {
         "arcvm": arcvm_cflags,
         default: [],
     }),
+
+    header_libs: [
+        "mesa_src_util_format_u_format_gen_h",
+    ],
+
+    include_dirs: [
+        "external/mesa/include",
+        "external/mesa/src",
+    ],
 
     product_variables: {
         platform_sdk_version: {
@@ -190,6 +200,12 @@ cc_library {
             // to a system copy of libdrm, which conflicts with the AOSP one
             allow_undefined_symbols: true,
             header_libs: ["libdrm_headers"],
+        },
+        linux_glibc: {
+            cflags: [
+                "-DUTIL_ARCH_LITTLE_ENDIAN=1",
+                "-DUTIL_ARCH_BIG_ENDIAN=0",
+            ],
         },
         android: {
             shared_libs: [
