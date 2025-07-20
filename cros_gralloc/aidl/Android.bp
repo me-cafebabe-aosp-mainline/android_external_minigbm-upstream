@@ -27,7 +27,10 @@ cc_defaults {
     name: "defaults_android.hardware.graphics.allocator-service.minigbm",
     defaults: ["minigbm_cros_gralloc_defaults"],
     relative_install_path: "hw",
-    vintf_fragments: ["allocator.xml"],
+    vintf_fragments: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
+        false: [],
+        default: ["allocator.xml"],
+    }),
     vendor: true,
     shared_libs: [
         "android.hardware.graphics.allocator-V2-ndk",
@@ -52,7 +55,10 @@ cc_defaults {
 cc_binary {
     name: "android.hardware.graphics.allocator-service.minigbm",
     defaults: ["defaults_android.hardware.graphics.allocator-service.minigbm"],
-    init_rc: ["allocator.rc"],
+    init_rc: select(soong_config_variable("minigbm", "include_init_rc"), {
+        false: [],
+        default: ["allocator.rc"],
+    }),
     cflags: [
         "-DIMAPPER_LIBRARY_SUFFIX=\"minigbm\"",
     ],
@@ -64,7 +70,10 @@ cc_binary {
 cc_binary {
     name: "android.hardware.graphics.allocator-service.minigbm_generic_x86",
     defaults: ["defaults_android.hardware.graphics.allocator-service.minigbm"],
-    init_rc: ["allocator.generic_x86.rc"],
+    init_rc: select(soong_config_variable("minigbm", "include_init_rc"), {
+        false: [],
+        default: ["allocator.generic_x86.rc"],
+    }),
     cflags: [
         "-DIMAPPER_LIBRARY_SUFFIX=\"minigbm_generic_x86\"",
     ],

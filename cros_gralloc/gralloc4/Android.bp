@@ -89,40 +89,70 @@ cc_binary {
     name: "android.hardware.graphics.allocator@4.0-service.minigbm",
     defaults: ["minigbm_gralloc4_allocator_defaults"],
     shared_libs: ["libminigbm_gralloc"],
-    vintf_fragment_modules: ["android.hardware.graphics.allocator@4.0.xml"],
-    init_rc: ["android.hardware.graphics.allocator@4.0-service.minigbm.rc"],
+    vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
+        false: [],
+        default: ["android.hardware.graphics.allocator@4.0.xml"],
+    }),
+    init_rc: select(soong_config_variable("minigbm", "include_init_rc"), {
+        false: [],
+        default: ["android.hardware.graphics.allocator@4.0-service.minigbm.rc"],
+    }),
 }
 
 cc_binary {
     name: "android.hardware.graphics.allocator@4.0-service.minigbm_generic_x86",
     defaults: ["minigbm_gralloc4_allocator_defaults"],
     shared_libs: ["libminigbm_gralloc_generic_x86"],
-    vintf_fragment_modules: ["android.hardware.graphics.allocator@4.0.xml"],
-    init_rc: ["android.hardware.graphics.allocator@4.0-service.minigbm_generic_x86.rc"],
+    vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
+        false: [],
+        default: ["android.hardware.graphics.allocator@4.0.xml"],
+    }),
+    init_rc: select(soong_config_variable("minigbm", "include_init_rc"), {
+        false: [],
+        default: ["android.hardware.graphics.allocator@4.0-service.minigbm_generic_x86.rc"],
+    }),
 }
 
 cc_binary {
     name: "android.hardware.graphics.allocator@4.0-service.minigbm_msm",
     defaults: ["minigbm_gralloc4_allocator_defaults"],
     shared_libs: ["libminigbm_gralloc_msm"],
-    vintf_fragment_modules: ["android.hardware.graphics.allocator@4.0.xml"],
-    init_rc: ["android.hardware.graphics.allocator@4.0-service.minigbm_msm.rc"],
+    vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
+        false: [],
+        default: ["android.hardware.graphics.allocator@4.0.xml"],
+    }),
+    init_rc: select(soong_config_variable("minigbm", "include_init_rc"), {
+        false: [],
+        default: ["android.hardware.graphics.allocator@4.0-service.minigbm_msm.rc"],
+    }),
 }
 
 cc_binary {
     name: "android.hardware.graphics.allocator@4.0-service.minigbm_arcvm",
     defaults: ["minigbm_gralloc4_allocator_defaults"],
     shared_libs: ["libminigbm_gralloc_arcvm"],
-    vintf_fragment_modules: ["android.hardware.graphics.allocator@4.0.xml"],
-    init_rc: ["android.hardware.graphics.allocator@4.0-service.minigbm_arcvm.rc"],
+    vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
+        false: [],
+        default: ["android.hardware.graphics.allocator@4.0.xml"],
+    }),
+    init_rc: select(soong_config_variable("minigbm", "include_init_rc"), {
+        false: [],
+        default: ["android.hardware.graphics.allocator@4.0-service.minigbm_arcvm.rc"],
+    }),
 }
 
 cc_binary {
     name: "android.hardware.graphics.allocator@4.0-service.minigbm_intel",
     defaults: ["minigbm_gralloc4_allocator_defaults"],
     shared_libs: ["libminigbm_gralloc_intel"],
-    vintf_fragment_modules: ["android.hardware.graphics.allocator@4.0.xml"],
-    init_rc: ["android.hardware.graphics.allocator@4.0-service.minigbm_intel.rc"],
+    vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
+        false: [],
+        default: ["android.hardware.graphics.allocator@4.0.xml"],
+    }),
+    init_rc: select(soong_config_variable("minigbm", "include_init_rc"), {
+        false: [],
+        default: ["android.hardware.graphics.allocator@4.0-service.minigbm_intel.rc"],
+    }),
     enabled: false,
     arch: {
         x86: {
@@ -144,7 +174,10 @@ cc_library_shared {
     name: "android.hardware.graphics.mapper@4.0-impl.minigbm",
     defaults: ["minigbm_gralloc4_common_defaults"],
     shared_libs: ["libminigbm_gralloc"],
-    vintf_fragment_modules: ["android.hardware.graphics.mapper@4.0.xml"],
+    vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
+        false: [],
+        default: ["android.hardware.graphics.mapper@4.0.xml"],
+    }),
     srcs: [":minigbm_gralloc4_mapper_files"],
 }
 
@@ -152,7 +185,10 @@ cc_library_shared {
     name: "android.hardware.graphics.mapper@4.0-impl.minigbm_generic_x86",
     defaults: ["minigbm_gralloc4_common_defaults"],
     shared_libs: ["libminigbm_gralloc_generic_x86"],
-    vintf_fragment_modules: ["android.hardware.graphics.mapper@4.0.xml"],
+    vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
+        false: [],
+        default: ["android.hardware.graphics.mapper@4.0.xml"],
+    }),
     srcs: [":minigbm_gralloc4_mapper_files"],
 }
 
@@ -160,7 +196,10 @@ cc_library_shared {
     name: "android.hardware.graphics.mapper@4.0-impl.minigbm_msm",
     defaults: ["minigbm_gralloc4_common_defaults"],
     shared_libs: ["libminigbm_gralloc_msm"],
-    vintf_fragment_modules: ["android.hardware.graphics.mapper@4.0.xml"],
+    vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
+        false: [],
+        default: ["android.hardware.graphics.mapper@4.0.xml"],
+    }),
     srcs: [":minigbm_gralloc4_mapper_files"],
 }
 
@@ -168,7 +207,10 @@ cc_library_shared {
     name: "android.hardware.graphics.mapper@4.0-impl.minigbm_arcvm",
     defaults: ["minigbm_gralloc4_common_defaults"],
     shared_libs: ["libminigbm_gralloc_arcvm"],
-    vintf_fragment_modules: ["android.hardware.graphics.mapper@4.0.xml"],
+    vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
+        false: [],
+        default: ["android.hardware.graphics.mapper@4.0.xml"],
+    }),
     srcs: [":minigbm_gralloc4_mapper_files"],
 }
 
@@ -176,7 +218,10 @@ cc_library_shared {
     name: "android.hardware.graphics.mapper@4.0-impl.minigbm_intel",
     defaults: ["minigbm_gralloc4_common_defaults"],
     shared_libs: ["libminigbm_gralloc_intel"],
-    vintf_fragment_modules: ["android.hardware.graphics.mapper@4.0.xml"],
+    vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
+        false: [],
+        default: ["android.hardware.graphics.mapper@4.0.xml"],
+    }),
     srcs: [":minigbm_gralloc4_mapper_files"],
     enabled: false,
     arch: {

@@ -47,7 +47,10 @@ cc_library_shared {
     shared_libs: [
         "libminigbm_gralloc",
     ],
-    vintf_fragments: ["mapper.minigbm.xml"],
+    vintf_fragments: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
+        false: [],
+        default: ["mapper.minigbm.xml"],
+    }),
 }
 
 cc_library_shared {
@@ -56,7 +59,10 @@ cc_library_shared {
     shared_libs: [
         "libminigbm_gralloc_generic_x86",
     ],
-    vintf_fragments: ["mapper.minigbm_generic_x86.xml"],
+    vintf_fragments: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
+        false: [],
+        default: ["mapper.minigbm_generic_x86.xml"],
+    }),
 }
 
 prebuilt_etc {
