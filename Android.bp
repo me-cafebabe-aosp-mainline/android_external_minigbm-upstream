@@ -43,6 +43,7 @@ filegroup {
         "drv_array_helpers.c",
         "drv_helpers.c",
         "dumb_driver.c",
+        "hbm.c",
         "i915.c",
         "mediatek.c",
         "msm.c",
@@ -87,6 +88,10 @@ arcvm_cflags = ["-DVIRTIO_GPU_NEXT"]
 generic_x86_cflags = arcvm_cflags + generic_cflags + intel_cflags + [
     "-DDRV_AMDGPU",
     "-DDRV_VMWGFX",
+]
+
+generic_x86_cros_gralloc_cflags = [
+    "-DDRV_HBM_HELPER",
 ]
 
 cc_defaults {
@@ -139,6 +144,11 @@ cc_defaults {
 
     defaults: ["minigbm_defaults"],
 
+    cflags: select(soong_config_variable("minigbm", "platform"), {
+        "generic_x86": generic_x86_cros_gralloc_cflags,
+        default: [],
+    }),
+
     header_libs: [
         "libhardware_headers",
         "libnativebase_headers",
@@ -158,7 +168,10 @@ cc_defaults {
         "liblog",
         "libnativewindow",
         "libsync",
-    ],
+    ] + select(soong_config_variable("minigbm", "platform"), {
+        "generic_x86": ["libhbm_minigbm"],
+        default: [],
+    }),
 }
 
 cc_defaults {
@@ -281,7 +294,7 @@ cc_library_headers {
 cc_library_shared {
     name: "libminigbm_gralloc_generic_x86",
     defaults: ["minigbm_cros_gralloc_library_defaults"],
-    cflags: generic_x86_cflags,
+    cflags: generic_x86_cflags + generic_x86_cros_gralloc_cflags,
 }
 
 cc_library_shared {
