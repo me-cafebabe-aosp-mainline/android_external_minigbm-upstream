@@ -205,6 +205,18 @@ static void msm_add_ubwc_combinations(struct driver *drv, const uint32_t *format
  */
 static bool should_avoid_ubwc(void)
 {
+#ifdef __ANDROID__
+    static bool prop_parsed = false, prop_value = false;
+    const char *prop_buf;
+    if (prop_parsed) {
+        return prop_value;
+    } else {
+        prop_buf = drv_get_os_option("vendor.minigbm.avoid_ubwc");
+        prop_value = prop_buf && !strcmp(prop_buf, "true");
+        prop_parsed = true;
+        return prop_value;
+    }
+#endif
 #ifndef __ANDROID__
 	/* waffle is buggy and, requests a renderable buffer (which on qcom platforms, we
 	 * want to use UBWC), and then passes it to the kernel discarding the modifier.
