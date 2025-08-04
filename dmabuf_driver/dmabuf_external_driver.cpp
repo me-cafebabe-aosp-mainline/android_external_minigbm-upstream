@@ -1,3 +1,5 @@
+#ifdef DRV_DMABUF_HEAP
+
 #include "dmabuf_internals.h"
 
 #include "drv_priv.h"
@@ -23,4 +25,6 @@ struct backend backend_dmabuf_heap = {
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

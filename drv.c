@@ -28,6 +28,13 @@
 #include "drv_priv.h"
 #include "util.h"
 
+#ifdef DRV_DMABUF_HEAP
+extern const struct backend backend_dmabuf_heap;
+#endif
+#ifdef DRV_GBM_MESA
+extern const struct backend backend_gbm_mesa;
+#endif
+
 #ifdef DRV_AMDGPU
 extern const struct backend backend_amdgpu;
 #endif
@@ -103,6 +110,29 @@ static const struct backend *drv_get_backend(int fd)
 {
 	drmVersionPtr drm_version;
 	unsigned int i;
+
+#ifdef __ANDROID__
+	const char *prop_buf;
+	prop_buf = drv_get_os_option("vendor.minigbm.generic_backend");
+
+	if (prop_buf != NULL) {
+		if (!strcmp(prop_buf, "dmabuf_heap")) {
+#ifdef DRV_DMABUF_HEAP
+			return &backend_dmabuf_heap;
+#else
+			drv_loge("dmabuf_heap backend is not compiled in\n");
+#endif
+		}
+		if (!strcmp(prop_buf, "gbm_mesa")) {
+#ifdef DRV_GBM_MESA
+			return &backend_gbm_mesa;
+#else
+			drv_loge("gbm_mesa backend is not compiled in\n");
+#endif
+		}
+		drv_loge("Invalid generic backend specified\n");
+	}
+#endif
 
 	drm_version = drmGetVersion(fd);
 

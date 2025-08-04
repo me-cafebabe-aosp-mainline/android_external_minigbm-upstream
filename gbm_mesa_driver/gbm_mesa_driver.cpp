@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#ifdef DRV_DMABUF_HEAP
+
 #include "gbm_mesa_internals.h"
 
 #include "drv_priv.h"
@@ -39,4 +41,6 @@ struct backend backend_gbm_mesa = {
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

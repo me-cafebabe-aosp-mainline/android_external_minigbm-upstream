@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#ifdef DRV_DMABUF_HEAP
+
 #define LOG_TAG "GBM-MESA-WRAPPER"
 
 #include <gbm.h>
@@ -206,3 +208,5 @@ __attribute__((visibility("default"))) struct gbm_ops *get_gbm_ops()
 {
 	return &gbm_ops;
 }
+
+#endif

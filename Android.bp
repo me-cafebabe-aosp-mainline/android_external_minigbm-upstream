@@ -54,6 +54,21 @@ filegroup {
         "virtgpu_virgl.c",
         "vmwgfx.c",
         "xe.c",
+
+        "dmabuf_driver/dmabuf_external_driver.cpp",
+        "dmabuf_driver/dmabuf_internals.cpp",
+        "gbm_mesa_driver/gbm_mesa_driver.cpp",
+        "gbm_mesa_driver/gbm_mesa_internals.cpp",
+        "gbm_mesa_driver/gbm_mesa_wrapper.c",
+    ],
+}
+
+filegroup {
+    name: "gbm_files",
+
+    srcs: [
+        "gbm.c",
+        "gbm_helpers.c",
     ],
 }
 
@@ -91,6 +106,8 @@ generic_x86_cflags = arcvm_cflags + generic_cflags + intel_cflags + [
 ]
 
 generic_x86_cros_gralloc_cflags = [
+    "-DDRV_DMABUF_HEAP",
+    "-DDRV_GBM_MESA",
     "-DDRV_HBM_HELPER",
 ]
 
@@ -143,6 +160,11 @@ cc_defaults {
     name: "minigbm_cros_gralloc_defaults",
 
     defaults: ["minigbm_defaults"],
+
+    srcs: select(soong_config_variable("minigbm", "platform"), {
+        "generic_x86": [":gbm_files"],
+        default: [],
+    }),
 
     cflags: select(soong_config_variable("minigbm", "platform"), {
         "generic_x86": generic_x86_cros_gralloc_cflags,
@@ -201,8 +223,7 @@ cc_library {
 
     srcs: [
         ":minigbm_core_files",
-        "gbm.c",
-        "gbm_helpers.c",
+        ":gbm_files",
         "minigbm_helpers.c",
     ],
 
@@ -294,6 +315,7 @@ cc_library_headers {
 cc_library_shared {
     name: "libminigbm_gralloc_generic_x86",
     defaults: ["minigbm_cros_gralloc_library_defaults"],
+    srcs: [":gbm_files"],
     cflags: generic_x86_cflags + generic_x86_cros_gralloc_cflags,
 }
 

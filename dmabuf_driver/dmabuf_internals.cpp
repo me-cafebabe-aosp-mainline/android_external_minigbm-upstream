@@ -1,3 +1,5 @@
+#ifdef DRV_DMABUF_HEAP
+
 #define LOG_TAG "DMABUF-GRALLOC"
 
 extern "C" {
@@ -334,3 +336,5 @@ int dmabuf_bo_flush(struct bo *bo, struct mapping *mapping)
 
 	return 0;
 }
+
+#endif

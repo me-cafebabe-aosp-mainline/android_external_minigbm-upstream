@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#ifdef DRV_DMABUF_HEAP
+
 #define LOG_TAG "GBM-MESA-GRALLOC"
 
 extern "C" {
@@ -52,6 +54,10 @@ extern "C" {
 
 // PRIx64
 #include <inttypes.h>
+
+#ifdef __ANDROID__
+#define EMBEDDED_GBM_WRAPPER
+#endif
 
 #ifndef EMBEDDED_GBM_WRAPPER
 #define GBM_WRAPPER_NAME "libgbm_mesa_wrapper.so"
@@ -593,3 +599,5 @@ uint32_t gbm_mesa_bo_get_map_stride(struct bo *bo)
 
 	return priv->map_stride;
 }
+
+#endif
