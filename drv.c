@@ -55,6 +55,7 @@ extern const struct backend backend_vmwgfx;
 #endif
 
 // Dumb / generic drivers
+extern const struct backend backend_dumb_generic;
 extern const struct backend backend_evdi;
 extern const struct backend backend_marvell;
 extern const struct backend backend_mediatek;
@@ -122,6 +123,9 @@ static const struct backend *drv_get_backend(int fd)
 #else
 			drv_loge("dmabuf_heap backend is not compiled in\n");
 #endif
+		}
+		if (!strcmp(prop_buf, "dumb_generic")) {
+			return &backend_dumb_generic;
 		}
 		if (!strcmp(prop_buf, "gbm_mesa")) {
 #ifdef DRV_GBM_MESA
