@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-service vendor.graphics.allocator-4-0 /vendor/bin/hw/android.hardware.graphics.allocator@4.0-service.minigbm_msm
+service vendor.graphics.allocator-4-0 /vendor/bin/hw/android.hardware.graphics.allocator@4.0-service.minigbm_wildroid_msm
     interface android.hardware.graphics.allocator@4.0::IAllocator default
     class hal animation
     user system

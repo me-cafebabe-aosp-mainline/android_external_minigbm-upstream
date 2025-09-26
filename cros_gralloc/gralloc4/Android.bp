@@ -79,12 +79,6 @@ cc_defaults {
     srcs: [":minigbm_gralloc4_allocator_files"],
 }
 
-vintf_fragment {
-    name: "android.hardware.graphics.allocator@4.0.xml",
-    src: "android.hardware.graphics.allocator@4.0.xml",
-    vendor: true,
-}
-
 cc_binary {
     name: "android.hardware.graphics.allocator@4.0-service.minigbm",
     defaults: ["minigbm_gralloc4_allocator_defaults"],
@@ -162,12 +156,6 @@ cc_binary {
             enabled: true,
         },
     },
-}
-
-vintf_fragment {
-    name: "android.hardware.graphics.mapper@4.0.xml",
-    src: "android.hardware.graphics.mapper@4.0.xml",
-    vendor: true,
 }
 
 cc_library_shared {

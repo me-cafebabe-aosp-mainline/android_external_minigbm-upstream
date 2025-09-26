@@ -216,7 +216,7 @@ cc_defaults {
 }
 
 cc_library {
-    name: "libgbm",
+    name: "libgbm_wildroid",
     defaults: ["minigbm_defaults"],
     host_supported: true,
     min_sdk_version: "34",
@@ -263,8 +263,8 @@ cc_library {
 
 // Rust bindings to minigbm, generated in a way compatible with gbm crate.
 rust_bindgen {
-    name: "libgbm_sys",
-    crate_name: "gbm_sys",
+    name: "libgbm_wildroid_sys",
+    crate_name: "gbm_wildroid_sys",
     wrapper_src: "rust/gbm_wrapper.h",
     source_stem: "bindings",
     bindgen_flags: [
@@ -274,7 +274,7 @@ rust_bindgen {
         "--blocklist-type=__BINDGEN_TMP_.*",
         "--constified-enum-module=^gbm_.*$",
     ],
-    shared_libs: ["libgbm"],
+    shared_libs: ["libgbm_wildroid"],
     host_supported: true,
     vendor_available: true,
     product_available: true,

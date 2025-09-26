@@ -1,4 +1,4 @@
-service vendor.graphics.allocator /vendor/bin/hw/android.hardware.graphics.allocator-service.minigbm_generic_x86
+service vendor.graphics.allocator /vendor/bin/hw/android.hardware.graphics.allocator-service.minigbm_wildroid_generic_x86
     class hal animation
     user system
     group graphics drmrpc

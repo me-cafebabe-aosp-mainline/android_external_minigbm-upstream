@@ -3,7 +3,7 @@
         <name>mapper</name>
         <version>5.0</version>
         <interface>
-            <instance>minigbm_generic_x86</instance>
+            <instance>minigbm_wildroid</instance>
         </interface>
     </hal>
 </manifest>

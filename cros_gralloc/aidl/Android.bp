@@ -29,7 +29,7 @@ cc_defaults {
     relative_install_path: "hw",
     vintf_fragments: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
         false: [],
-        default: ["allocator.xml"],
+        default: ["allocator.minigbm_wildroid.xml"],
     }),
     vendor: true,
     shared_libs: [
@@ -57,10 +57,10 @@ cc_binary {
     defaults: ["defaults_android.hardware.graphics.allocator-service.minigbm"],
     init_rc: select(soong_config_variable("minigbm", "include_init_rc"), {
         false: [],
-        default: ["allocator.rc"],
+        default: ["allocator.minigbm_wildroid.rc"],
     }),
     cflags: [
-        "-DIMAPPER_LIBRARY_SUFFIX=\"minigbm\"",
+        "-DIMAPPER_LIBRARY_SUFFIX=\"minigbm_wildroid\"",
     ],
     shared_libs: [
         "libminigbm_gralloc",
@@ -72,10 +72,10 @@ cc_binary {
     defaults: ["defaults_android.hardware.graphics.allocator-service.minigbm"],
     init_rc: select(soong_config_variable("minigbm", "include_init_rc"), {
         false: [],
-        default: ["allocator.generic_x86.rc"],
+        default: ["allocator.minigbm_wildroid_generic_x86.rc"],
     }),
     cflags: [
-        "-DIMAPPER_LIBRARY_SUFFIX=\"minigbm_generic_x86\"",
+        "-DIMAPPER_LIBRARY_SUFFIX=\"minigbm_wildroid_generic_x86\"",
     ],
     shared_libs: [
         "libminigbm_gralloc_generic_x86",
@@ -83,18 +83,18 @@ cc_binary {
 }
 
 filegroup {
-    name: "allocator.minigbm.rc",
-    srcs: ["allocator.rc"]
+    name: "allocator.minigbm_wildroid.rc",
+    srcs: ["allocator.minigbm_wildroid.rc"]
 }
 
 filegroup {
-    name: "allocator.minigbm_generic_x86.rc",
-    srcs: ["allocator.generic_x86.rc"]
+    name: "allocator.minigbm_wildroid_generic_x86.rc",
+    srcs: ["allocator.minigbm_wildroid_generic_x86.rc"]
 }
 
 prebuilt_etc {
-    name: "allocator.minigbm.xml",
-    src: "allocator.xml",
+    name: "allocator.minigbm_wildroid.xml",
+    src: "allocator.minigbm_wildroid.xml",
     sub_dir: "vintf",
     installable: false,
 }
