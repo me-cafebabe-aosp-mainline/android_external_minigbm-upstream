@@ -2,7 +2,7 @@
 // found in the LICENSE file.
 
 package {
-    default_applicable_licenses: ["external_minigbm_license"],
+    default_applicable_licenses: ["wildroid_external_minigbm_license"],
 }
 
 // Added automatically by a large-scale-change that took the approach of
@@ -20,7 +20,7 @@ package {
 // used in the current project.
 // See: http://go/android-license-faq
 license {
-    name: "external_minigbm_license",
+    name: "wildroid_external_minigbm_license",
     visibility: [":__subpackages__"],
     license_kinds: [
         "SPDX-license-identifier-Apache-2.0",
@@ -33,7 +33,7 @@ license {
 }
 
 filegroup {
-    name: "minigbm_core_files",
+    name: "wildroid_minigbm_core_files",
 
     srcs: [
         "amdgpu.c",
@@ -64,7 +64,7 @@ filegroup {
 }
 
 filegroup {
-    name: "gbm_files",
+    name: "wildroid_gbm_files",
 
     srcs: [
         "gbm.c",
@@ -73,7 +73,7 @@ filegroup {
 }
 
 filegroup {
-    name: "minigbm_gralloc_common_files",
+    name: "wildroid_minigbm_gralloc_common_files",
 
     srcs: [
         "cros_gralloc/cros_gralloc_buffer.cc",
@@ -83,7 +83,7 @@ filegroup {
 }
 
 filegroup {
-    name: "minigbm_gralloc0_files",
+    name: "wildroid_minigbm_gralloc0_files",
     srcs: ["cros_gralloc/gralloc0/gralloc0.cc"],
 }
 
@@ -112,7 +112,7 @@ generic_x86_cros_gralloc_cflags = [
 ]
 
 cc_defaults {
-    name: "minigbm_defaults",
+    name: "wildroid_minigbm_defaults",
 
     cflags: [
         "-D_FILE_OFFSET_BITS=64",
@@ -150,19 +150,19 @@ cc_defaults {
 }
 
 cc_library_headers {
-    name: "minigbm_headers",
+    name: "wildroid_minigbm_headers",
     host_supported: true,
     vendor_available: true,
     export_include_dirs: ["."],
 }
 
 cc_defaults {
-    name: "minigbm_cros_gralloc_defaults",
+    name: "wildroid_minigbm_cros_gralloc_defaults",
 
-    defaults: ["minigbm_defaults"],
+    defaults: ["wildroid_minigbm_defaults"],
 
     srcs: select(soong_config_variable("minigbm", "platform"), {
-        "generic_x86": [":gbm_files"],
+        "generic_x86": [":wildroid_gbm_files"],
         default: [],
     }),
 
@@ -175,7 +175,7 @@ cc_defaults {
         "libhardware_headers",
         "libnativebase_headers",
         "libsystem_headers",
-        "minigbm_headers",
+        "wildroid_minigbm_headers",
     ],
 
     static_libs: ["libarect"],
@@ -197,33 +197,33 @@ cc_defaults {
 }
 
 cc_defaults {
-    name: "minigbm_cros_gralloc_library_defaults",
+    name: "wildroid_minigbm_cros_gralloc_library_defaults",
 
-    defaults: ["minigbm_cros_gralloc_defaults"],
+    defaults: ["wildroid_minigbm_cros_gralloc_defaults"],
     srcs: [
-        ":minigbm_core_files",
-        ":minigbm_gralloc_common_files",
+        ":wildroid_minigbm_core_files",
+        ":wildroid_minigbm_gralloc_common_files",
     ],
 }
 
 cc_defaults {
-    name: "minigbm_cros_gralloc0_defaults",
+    name: "wildroid_minigbm_cros_gralloc0_defaults",
 
-    defaults: ["minigbm_cros_gralloc_defaults"],
+    defaults: ["wildroid_minigbm_cros_gralloc_defaults"],
     relative_install_path: "hw",
 
-    srcs: [":minigbm_gralloc0_files"],
+    srcs: [":wildroid_minigbm_gralloc0_files"],
 }
 
 cc_library {
     name: "libgbm_wildroid",
-    defaults: ["minigbm_defaults"],
+    defaults: ["wildroid_minigbm_defaults"],
     host_supported: true,
     min_sdk_version: "34",
 
     srcs: [
-        ":minigbm_core_files",
-        ":gbm_files",
+        ":wildroid_minigbm_core_files",
+        ":wildroid_gbm_files",
         "minigbm_helpers.c",
     ],
 
@@ -290,19 +290,19 @@ rust_bindgen {
 
 // Generic
 cc_library_shared {
-    name: "libminigbm_gralloc",
-    defaults: ["minigbm_cros_gralloc_library_defaults"],
+    name: "libminigbm_wildroid_gralloc",
+    defaults: ["wildroid_minigbm_cros_gralloc_library_defaults"],
     cflags: generic_cflags,
 }
 
 cc_library_shared {
-    name: "gralloc.minigbm",
-    defaults: ["minigbm_cros_gralloc0_defaults"],
-    shared_libs: ["libminigbm_gralloc"],
+    name: "gralloc.minigbm_wildroid",
+    defaults: ["wildroid_minigbm_cros_gralloc0_defaults"],
+    shared_libs: ["libminigbm_wildroid_gralloc"],
 }
 
 cc_library_headers {
-    name: "libminigbm_gralloc_headers",
+    name: "libminigbm_wildroid_gralloc_headers",
     host_supported: true,
     vendor_available: true,
     export_include_dirs: ["cros_gralloc"],
@@ -313,22 +313,22 @@ cc_library_headers {
 
 // Generic x86
 cc_library_shared {
-    name: "libminigbm_gralloc_generic_x86",
-    defaults: ["minigbm_cros_gralloc_library_defaults"],
-    srcs: [":gbm_files"],
+    name: "libminigbm_wildroid_gralloc_generic_x86",
+    defaults: ["wildroid_minigbm_cros_gralloc_library_defaults"],
+    srcs: [":wildroid_gbm_files"],
     cflags: generic_x86_cflags + generic_x86_cros_gralloc_cflags,
 }
 
 cc_library_shared {
-    name: "gralloc.minigbm_generic_x86",
-    defaults: ["minigbm_cros_gralloc0_defaults"],
-    shared_libs: ["libminigbm_gralloc_generic_x86"],
+    name: "gralloc.minigbm_wildroid_generic_x86",
+    defaults: ["wildroid_minigbm_cros_gralloc0_defaults"],
+    shared_libs: ["libminigbm_wildroid_gralloc_generic_x86"],
 }
 
 // Intel
 cc_library_shared {
-    name: "libminigbm_gralloc_intel",
-    defaults: ["minigbm_cros_gralloc_library_defaults"],
+    name: "libminigbm_wildroid_gralloc_intel",
+    defaults: ["wildroid_minigbm_cros_gralloc_library_defaults"],
     cflags: intel_cflags,
     enabled: false,
     arch: {
@@ -342,9 +342,9 @@ cc_library_shared {
 }
 
 cc_library_shared {
-    name: "gralloc.minigbm_intel",
-    defaults: ["minigbm_cros_gralloc0_defaults"],
-    shared_libs: ["libminigbm_gralloc_intel"],
+    name: "gralloc.minigbm_wildroid_intel",
+    defaults: ["wildroid_minigbm_cros_gralloc0_defaults"],
+    shared_libs: ["libminigbm_wildroid_gralloc_intel"],
     enabled: false,
     arch: {
         x86: {
@@ -358,39 +358,39 @@ cc_library_shared {
 
 // Meson
 cc_library_shared {
-    name: "libminigbm_gralloc_meson",
-    defaults: ["minigbm_cros_gralloc_library_defaults"],
+    name: "libminigbm_wildroid_gralloc_meson",
+    defaults: ["wildroid_minigbm_cros_gralloc_library_defaults"],
     cflags: meson_cflags,
 }
 
 cc_library_shared {
-    name: "gralloc.minigbm_meson",
-    defaults: ["minigbm_cros_gralloc0_defaults"],
-    shared_libs: ["libminigbm_gralloc_meson"],
+    name: "gralloc.minigbm_wildroid_meson",
+    defaults: ["wildroid_minigbm_cros_gralloc0_defaults"],
+    shared_libs: ["libminigbm_wildroid_gralloc_meson"],
 }
 
 // MSM
 cc_library_shared {
-    name: "libminigbm_gralloc_msm",
-    defaults: ["minigbm_cros_gralloc_library_defaults"],
+    name: "libminigbm_wildroid_gralloc_msm",
+    defaults: ["wildroid_minigbm_cros_gralloc_library_defaults"],
     cflags: msm_cflags,
 }
 
 cc_library_shared {
-    name: "gralloc.minigbm_msm",
-    defaults: ["minigbm_cros_gralloc0_defaults"],
-    shared_libs: ["libminigbm_gralloc_msm"],
+    name: "gralloc.minigbm_wildroid_msm",
+    defaults: ["wildroid_minigbm_cros_gralloc0_defaults"],
+    shared_libs: ["libminigbm_wildroid_gralloc_msm"],
 }
 
 // ARCVM
 cc_library_shared {
-    name: "libminigbm_gralloc_arcvm",
-    defaults: ["minigbm_cros_gralloc_library_defaults"],
+    name: "libminigbm_wildroid_gralloc_arcvm",
+    defaults: ["wildroid_minigbm_cros_gralloc_library_defaults"],
     cflags: arcvm_cflags,
 }
 
 cc_library_shared {
-    name: "gralloc.minigbm_arcvm",
-    defaults: ["minigbm_cros_gralloc0_defaults"],
-    shared_libs: ["libminigbm_gralloc_arcvm"],
+    name: "gralloc.minigbm_wildroid_arcvm",
+    defaults: ["wildroid_minigbm_cros_gralloc0_defaults"],
+    shared_libs: ["libminigbm_wildroid_gralloc_arcvm"],
 }

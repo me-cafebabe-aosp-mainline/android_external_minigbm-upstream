@@ -16,16 +16,16 @@
 package {
     // See: http://go/android-license-faq
     // A large-scale-change added 'default_applicable_licenses' to import
-    // all of the 'license_kinds' from "external_minigbm_license"
+    // all of the 'license_kinds' from "wildroid_external_minigbm_license"
     // to get the below license kinds:
     //   SPDX-license-identifier-Apache-2.0
     //   SPDX-license-identifier-BSD
-    default_applicable_licenses: ["external_minigbm_license"],
+    default_applicable_licenses: ["wildroid_external_minigbm_license"],
 }
 
 cc_defaults {
-    name: "defaults_android.hardware.graphics.allocator-service.minigbm",
-    defaults: ["minigbm_cros_gralloc_defaults"],
+    name: "defaults_android.hardware.graphics.allocator-service.minigbm_wildroid",
+    defaults: ["wildroid_minigbm_cros_gralloc_defaults"],
     relative_install_path: "hw",
     vintf_fragments: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
         false: [],
@@ -40,8 +40,8 @@ cc_defaults {
         "libgralloctypes",
         "libhidlbase",
         "liblog",
-        "libminigbm_gralloc",
-        "libminigbm_gralloc4_utils",
+        "libminigbm_wildroid_gralloc",
+        "libminigbm_wildroid_gralloc4_utils",
     ],
     static_libs: [
         "libaidlcommonsupport",
@@ -53,8 +53,8 @@ cc_defaults {
 }
 
 cc_binary {
-    name: "android.hardware.graphics.allocator-service.minigbm",
-    defaults: ["defaults_android.hardware.graphics.allocator-service.minigbm"],
+    name: "android.hardware.graphics.allocator-service.minigbm_wildroid",
+    defaults: ["defaults_android.hardware.graphics.allocator-service.minigbm_wildroid"],
     init_rc: select(soong_config_variable("minigbm", "include_init_rc"), {
         false: [],
         default: ["allocator.minigbm_wildroid.rc"],
@@ -63,13 +63,13 @@ cc_binary {
         "-DIMAPPER_LIBRARY_SUFFIX=\"minigbm_wildroid\"",
     ],
     shared_libs: [
-        "libminigbm_gralloc",
+        "libminigbm_wildroid_gralloc",
     ],
 }
 
 cc_binary {
-    name: "android.hardware.graphics.allocator-service.minigbm_generic_x86",
-    defaults: ["defaults_android.hardware.graphics.allocator-service.minigbm"],
+    name: "android.hardware.graphics.allocator-service.minigbm_wildroid_generic_x86",
+    defaults: ["defaults_android.hardware.graphics.allocator-service.minigbm_wildroid"],
     init_rc: select(soong_config_variable("minigbm", "include_init_rc"), {
         false: [],
         default: ["allocator.minigbm_wildroid_generic_x86.rc"],
@@ -78,7 +78,7 @@ cc_binary {
         "-DIMAPPER_LIBRARY_SUFFIX=\"minigbm_wildroid_generic_x86\"",
     ],
     shared_libs: [
-        "libminigbm_gralloc_generic_x86",
+        "libminigbm_wildroid_gralloc_generic_x86",
     ],
 }
 

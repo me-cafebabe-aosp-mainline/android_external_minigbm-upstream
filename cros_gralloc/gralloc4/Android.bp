@@ -16,15 +16,15 @@
 package {
     // See: http://go/android-license-faq
     // A large-scale-change added 'default_applicable_licenses' to import
-    // all of the 'license_kinds' from "external_minigbm_license"
+    // all of the 'license_kinds' from "wildroid_external_minigbm_license"
     // to get the below license kinds:
     //   SPDX-license-identifier-Apache-2.0
     //   SPDX-license-identifier-BSD
-    default_applicable_licenses: ["external_minigbm_license"],
+    default_applicable_licenses: ["wildroid_external_minigbm_license"],
 }
 
 filegroup {
-    name: "minigbm_gralloc4_allocator_files",
+    name: "wildroid_minigbm_gralloc4_allocator_files",
     srcs: [
         "CrosGralloc4Allocator.cc",
         "CrosGralloc4AllocatorService.cc",
@@ -33,7 +33,7 @@ filegroup {
 }
 
 filegroup {
-    name: "minigbm_gralloc4_mapper_files",
+    name: "wildroid_minigbm_gralloc4_mapper_files",
     srcs: [
         "CrosGralloc4Mapper.cc",
         "CrosGralloc4Utils.cc",
@@ -41,8 +41,8 @@ filegroup {
 }
 
 cc_library {
-    name: "libminigbm_gralloc4_utils",
-    defaults: ["minigbm_cros_gralloc_defaults"],
+    name: "libminigbm_wildroid_gralloc4_utils",
+    defaults: ["wildroid_minigbm_cros_gralloc_defaults"],
     vendor: true,
     srcs: [
         "CrosGralloc4Utils.cc",
@@ -51,13 +51,13 @@ cc_library {
         "android.hardware.graphics.mapper@4.0",
         "libgralloctypes",
         "libhidlbase",
-        "libminigbm_gralloc",
+        "libminigbm_wildroid_gralloc",
     ],
 }
 
 cc_defaults {
-    name: "minigbm_gralloc4_common_defaults",
-    defaults: ["minigbm_cros_gralloc_defaults"],
+    name: "wildroid_minigbm_gralloc4_common_defaults",
+    defaults: ["wildroid_minigbm_cros_gralloc_defaults"],
 
     shared_libs: [
         "android.hardware.graphics.mapper@4.0",
@@ -72,80 +72,80 @@ cc_defaults {
 }
 
 cc_defaults {
-    name: "minigbm_gralloc4_allocator_defaults",
-    defaults: ["minigbm_gralloc4_common_defaults"],
+    name: "wildroid_minigbm_gralloc4_allocator_defaults",
+    defaults: ["wildroid_minigbm_gralloc4_common_defaults"],
 
     shared_libs: ["android.hardware.graphics.allocator@4.0"],
-    srcs: [":minigbm_gralloc4_allocator_files"],
+    srcs: [":wildroid_minigbm_gralloc4_allocator_files"],
 }
 
 cc_binary {
-    name: "android.hardware.graphics.allocator@4.0-service.minigbm",
-    defaults: ["minigbm_gralloc4_allocator_defaults"],
-    shared_libs: ["libminigbm_gralloc"],
+    name: "android.hardware.graphics.allocator@4.0-service.minigbm_wildroid",
+    defaults: ["wildroid_minigbm_gralloc4_allocator_defaults"],
+    shared_libs: ["libminigbm_wildroid_gralloc"],
     vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
         false: [],
         default: ["android.hardware.graphics.allocator@4.0.xml"],
     }),
     init_rc: select(soong_config_variable("minigbm", "include_init_rc"), {
         false: [],
-        default: ["android.hardware.graphics.allocator@4.0-service.minigbm.rc"],
+        default: ["android.hardware.graphics.allocator@4.0-service.minigbm_wildroid.rc"],
     }),
 }
 
 cc_binary {
-    name: "android.hardware.graphics.allocator@4.0-service.minigbm_generic_x86",
-    defaults: ["minigbm_gralloc4_allocator_defaults"],
-    shared_libs: ["libminigbm_gralloc_generic_x86"],
+    name: "android.hardware.graphics.allocator@4.0-service.minigbm_wildroid_generic_x86",
+    defaults: ["wildroid_minigbm_gralloc4_allocator_defaults"],
+    shared_libs: ["libminigbm_wildroid_gralloc_generic_x86"],
     vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
         false: [],
         default: ["android.hardware.graphics.allocator@4.0.xml"],
     }),
     init_rc: select(soong_config_variable("minigbm", "include_init_rc"), {
         false: [],
-        default: ["android.hardware.graphics.allocator@4.0-service.minigbm_generic_x86.rc"],
+        default: ["android.hardware.graphics.allocator@4.0-service.minigbm_wildroid_generic_x86.rc"],
     }),
 }
 
 cc_binary {
-    name: "android.hardware.graphics.allocator@4.0-service.minigbm_msm",
-    defaults: ["minigbm_gralloc4_allocator_defaults"],
-    shared_libs: ["libminigbm_gralloc_msm"],
+    name: "android.hardware.graphics.allocator@4.0-service.minigbm_wildroid_msm",
+    defaults: ["wildroid_minigbm_gralloc4_allocator_defaults"],
+    shared_libs: ["libminigbm_wildroid_gralloc_msm"],
     vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
         false: [],
         default: ["android.hardware.graphics.allocator@4.0.xml"],
     }),
     init_rc: select(soong_config_variable("minigbm", "include_init_rc"), {
         false: [],
-        default: ["android.hardware.graphics.allocator@4.0-service.minigbm_msm.rc"],
+        default: ["android.hardware.graphics.allocator@4.0-service.minigbm_wildroid_msm.rc"],
     }),
 }
 
 cc_binary {
-    name: "android.hardware.graphics.allocator@4.0-service.minigbm_arcvm",
-    defaults: ["minigbm_gralloc4_allocator_defaults"],
-    shared_libs: ["libminigbm_gralloc_arcvm"],
+    name: "android.hardware.graphics.allocator@4.0-service.minigbm_wildroid_arcvm",
+    defaults: ["wildroid_minigbm_gralloc4_allocator_defaults"],
+    shared_libs: ["libminigbm_wildroid_gralloc_arcvm"],
     vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
         false: [],
         default: ["android.hardware.graphics.allocator@4.0.xml"],
     }),
     init_rc: select(soong_config_variable("minigbm", "include_init_rc"), {
         false: [],
-        default: ["android.hardware.graphics.allocator@4.0-service.minigbm_arcvm.rc"],
+        default: ["android.hardware.graphics.allocator@4.0-service.minigbm_wildroid_arcvm.rc"],
     }),
 }
 
 cc_binary {
-    name: "android.hardware.graphics.allocator@4.0-service.minigbm_intel",
-    defaults: ["minigbm_gralloc4_allocator_defaults"],
-    shared_libs: ["libminigbm_gralloc_intel"],
+    name: "android.hardware.graphics.allocator@4.0-service.minigbm_wildroid_intel",
+    defaults: ["wildroid_minigbm_gralloc4_allocator_defaults"],
+    shared_libs: ["libminigbm_wildroid_gralloc_intel"],
     vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
         false: [],
         default: ["android.hardware.graphics.allocator@4.0.xml"],
     }),
     init_rc: select(soong_config_variable("minigbm", "include_init_rc"), {
         false: [],
-        default: ["android.hardware.graphics.allocator@4.0-service.minigbm_intel.rc"],
+        default: ["android.hardware.graphics.allocator@4.0-service.minigbm_wildroid_intel.rc"],
     }),
     enabled: false,
     arch: {
@@ -159,58 +159,58 @@ cc_binary {
 }
 
 cc_library_shared {
-    name: "android.hardware.graphics.mapper@4.0-impl.minigbm",
-    defaults: ["minigbm_gralloc4_common_defaults"],
-    shared_libs: ["libminigbm_gralloc"],
+    name: "android.hardware.graphics.mapper@4.0-impl.minigbm_wildroid",
+    defaults: ["wildroid_minigbm_gralloc4_common_defaults"],
+    shared_libs: ["libminigbm_wildroid_gralloc"],
     vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
         false: [],
         default: ["android.hardware.graphics.mapper@4.0.xml"],
     }),
-    srcs: [":minigbm_gralloc4_mapper_files"],
+    srcs: [":wildroid_minigbm_gralloc4_mapper_files"],
 }
 
 cc_library_shared {
-    name: "android.hardware.graphics.mapper@4.0-impl.minigbm_generic_x86",
-    defaults: ["minigbm_gralloc4_common_defaults"],
-    shared_libs: ["libminigbm_gralloc_generic_x86"],
+    name: "android.hardware.graphics.mapper@4.0-impl.minigbm_wildroid_generic_x86",
+    defaults: ["wildroid_minigbm_gralloc4_common_defaults"],
+    shared_libs: ["libminigbm_wildroid_gralloc_generic_x86"],
     vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
         false: [],
         default: ["android.hardware.graphics.mapper@4.0.xml"],
     }),
-    srcs: [":minigbm_gralloc4_mapper_files"],
+    srcs: [":wildroid_minigbm_gralloc4_mapper_files"],
 }
 
 cc_library_shared {
-    name: "android.hardware.graphics.mapper@4.0-impl.minigbm_msm",
-    defaults: ["minigbm_gralloc4_common_defaults"],
-    shared_libs: ["libminigbm_gralloc_msm"],
+    name: "android.hardware.graphics.mapper@4.0-impl.minigbm_wildroid_msm",
+    defaults: ["wildroid_minigbm_gralloc4_common_defaults"],
+    shared_libs: ["libminigbm_wildroid_gralloc_msm"],
     vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
         false: [],
         default: ["android.hardware.graphics.mapper@4.0.xml"],
     }),
-    srcs: [":minigbm_gralloc4_mapper_files"],
+    srcs: [":wildroid_minigbm_gralloc4_mapper_files"],
 }
 
 cc_library_shared {
-    name: "android.hardware.graphics.mapper@4.0-impl.minigbm_arcvm",
-    defaults: ["minigbm_gralloc4_common_defaults"],
-    shared_libs: ["libminigbm_gralloc_arcvm"],
+    name: "android.hardware.graphics.mapper@4.0-impl.minigbm_wildroid_arcvm",
+    defaults: ["wildroid_minigbm_gralloc4_common_defaults"],
+    shared_libs: ["libminigbm_wildroid_gralloc_arcvm"],
     vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
         false: [],
         default: ["android.hardware.graphics.mapper@4.0.xml"],
     }),
-    srcs: [":minigbm_gralloc4_mapper_files"],
+    srcs: [":wildroid_minigbm_gralloc4_mapper_files"],
 }
 
 cc_library_shared {
-    name: "android.hardware.graphics.mapper@4.0-impl.minigbm_intel",
-    defaults: ["minigbm_gralloc4_common_defaults"],
-    shared_libs: ["libminigbm_gralloc_intel"],
+    name: "android.hardware.graphics.mapper@4.0-impl.minigbm_wildroid_intel",
+    defaults: ["wildroid_minigbm_gralloc4_common_defaults"],
+    shared_libs: ["libminigbm_wildroid_gralloc_intel"],
     vintf_fragment_modules: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
         false: [],
         default: ["android.hardware.graphics.mapper@4.0.xml"],
     }),
-    srcs: [":minigbm_gralloc4_mapper_files"],
+    srcs: [":wildroid_minigbm_gralloc4_mapper_files"],
     enabled: false,
     arch: {
         x86: {

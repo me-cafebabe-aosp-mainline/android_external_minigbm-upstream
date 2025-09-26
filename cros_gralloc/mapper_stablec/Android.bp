@@ -16,16 +16,16 @@
 package {
     // See: http://go/android-license-faq
     // A large-scale-change added 'default_applicable_licenses' to import
-    // all of the 'license_kinds' from "external_minigbm_license"
+    // all of the 'license_kinds' from "wildroid_external_minigbm_license"
     // to get the below license kinds:
     //   SPDX-license-identifier-Apache-2.0
     //   SPDX-license-identifier-BSD
-    default_applicable_licenses: ["external_minigbm_license"],
+    default_applicable_licenses: ["wildroid_external_minigbm_license"],
 }
 
 cc_defaults {
-    name: "defaults_mapper.minigbm",
-    defaults: ["minigbm_gralloc4_common_defaults"],
+    name: "defaults_mapper.minigbm_wildroid",
+    defaults: ["wildroid_minigbm_gralloc4_common_defaults"],
     shared_libs: [
         "android.hardware.graphics.allocator-V2-ndk",
     ],
@@ -35,46 +35,46 @@ cc_defaults {
         "libimapper_providerutils",
     ],
     srcs: [
-        ":minigbm_gralloc4_mapper_files",
+        ":wildroid_minigbm_gralloc4_mapper_files",
         "Mapper.cpp",
     ],
     cpp_std: "c++20",
 }
 
 cc_library_shared {
-    name: "mapper.minigbm",
-    defaults: ["defaults_mapper.minigbm"],
+    name: "mapper.minigbm_wildroid",
+    defaults: ["defaults_mapper.minigbm_wildroid"],
     shared_libs: [
-        "libminigbm_gralloc",
+        "libminigbm_wildroid_gralloc",
     ],
     vintf_fragments: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
         false: [],
-        default: ["mapper.minigbm.xml"],
+        default: ["mapper.minigbm_wildroid.xml"],
     }),
 }
 
 cc_library_shared {
-    name: "mapper.minigbm_generic_x86",
-    defaults: ["defaults_mapper.minigbm"],
+    name: "mapper.minigbm_wildroid_generic_x86",
+    defaults: ["defaults_mapper.minigbm_wildroid"],
     shared_libs: [
-        "libminigbm_gralloc_generic_x86",
+        "libminigbm_wildroid_gralloc_generic_x86",
     ],
     vintf_fragments: select(soong_config_variable("minigbm", "include_vintf_fragments"), {
         false: [],
-        default: ["mapper.minigbm_generic_x86.xml"],
+        default: ["mapper.minigbm_wildroid_generic_x86.xml"],
     }),
 }
 
 prebuilt_etc {
-    name: "mapper.minigbm.xml",
-    src: "mapper.minigbm.xml",
+    name: "mapper.minigbm_wildroid.xml",
+    src: "mapper.minigbm_wildroid.xml",
     sub_dir: "vintf",
     installable: false,
 }
 
 prebuilt_etc {
-    name: "mapper.minigbm_generic_x86.xml",
-    src: "mapper.minigbm_generic_x86.xml",
+    name: "mapper.minigbm_wildroid_generic_x86.xml",
+    src: "mapper.minigbm_wildroid_generic_x86.xml",
     sub_dir: "vintf",
     installable: false,
 }
