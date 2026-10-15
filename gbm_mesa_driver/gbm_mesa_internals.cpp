@@ -358,12 +358,16 @@ int gbm_mesa_bo_create(struct bo *bo, uint32_t width, uint32_t height, uint32_t 
 
 	auto wr = drv->wrapper;
 
+	/* For a display on another device, which cannot use the modifiers of this GPU */
+	static const bool scanout_linear = property_get_bool("vendor.minigbm.scanout_linear", false);
+
 	struct alloc_args alloc_args = {
 		.gbm = drv->gbm_dev,
 		.width = width,
 		.height = height,
 		.drm_format = wr->get_gbm_format(format) ? format : 0,
-		.force_linear = (use_flags & BO_USE_SW_MASK) != 0,
+		.force_linear = (use_flags & BO_USE_SW_MASK) != 0 ||
+				(scanout_linear && (use_flags & BO_USE_SCANOUT) != 0),
 		.needs_map_stride = (use_flags & BO_USE_SW_MASK) != 0,
 		.use_scanout = (use_flags & (BO_USE_SCANOUT | BO_USE_CURSOR)) != 0,
 	};
