@@ -217,7 +217,37 @@ int open_drm_dev(bool card_node, std::function<bool(int, bool, std::string)> fou
 static std::array<std::string, 6> separate_dc_gpu_list = { "v3d",      "vc4",  "etnaviv",
 							   "panfrost", "lima", "freedreno" };
 
-static bool is_separate_dc_gpu(UniqueFd *out_gpu_fd)
+static bool is_same_drm_device(int fd_a, int fd_b)
+{
+	drmDevicePtr a = nullptr, b = nullptr;
+	bool same = false;
+
+	if (!drmGetDevice2(fd_a, 0, &a) && !drmGetDevice2(fd_b, 0, &b))
+		same = drmDevicesEqual(a, b);
+
+	if (a)
+		drmFreeDevice(&a);
+	if (b)
+		drmFreeDevice(&b);
+
+	return same;
+}
+
+static bool is_separate_dc_gpu_name(const std::string &drm_name)
+{
+	for (const auto &name : separate_dc_gpu_list) {
+		if (drm_name == name)
+			return true;
+	}
+
+	return false;
+}
+
+/*
+ * selected_fd is the DRM node that the gralloc selected. It is used when it is valid, so that the
+ * GPU is not another one, and for a device that has no render node.
+ */
+static bool is_separate_dc_gpu(UniqueFd *out_gpu_fd, int selected_fd)
 {
 	UniqueFd gpu_fd;
 	bool separate_dc = false;
@@ -227,15 +257,25 @@ static bool is_separate_dc_gpu(UniqueFd *out_gpu_fd)
 		if (separate_dc)
 			return false;
 
-		for (const auto &name : separate_dc_gpu_list) {
-			if (drm_name == std::string(name))
-				separate_dc = true;
-		}
+		if (selected_fd >= 0 && !is_same_drm_device(fd, selected_fd))
+			return false;
+
+		separate_dc = is_separate_dc_gpu_name(drm_name);
 		gpu_fd = UniqueFd(fd);
 		gpu_name = drm_name;
 
 		return true;
 	});
+
+	if (!gpu_fd && selected_fd >= 0) {
+		drmVersionPtr drm_version = drmGetVersion(selected_fd);
+		if (drm_version) {
+			gpu_name = std::string(drm_version->name);
+			drmFreeVersion(drm_version);
+		}
+		separate_dc = is_separate_dc_gpu_name(gpu_name);
+		gpu_fd = UniqueFd(dup(selected_fd));
+	}
 
 	*out_gpu_fd = std::move(gpu_fd);
 
@@ -252,7 +292,7 @@ static std::shared_ptr<GbmMesaDriver> gbm_mesa_get_or_init_driver(struct driver 
 	if (!drv->priv) {
 		gbm_mesa_drv = std::make_unique<GbmMesaDriver>();
 
-		bool look_for_kms = is_separate_dc_gpu(&gbm_mesa_drv->gpu_node_fd);
+		bool look_for_kms = is_separate_dc_gpu(&gbm_mesa_drv->gpu_node_fd, drv->fd);
 
 		if (look_for_kms && !mapper_sphal) {
 			drv_logi("GPU require KMSRO entry, searching for separate KMS driver...\n");
