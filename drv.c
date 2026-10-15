@@ -115,6 +115,21 @@ void drv_preload(bool load)
 #endif
 }
 
+#ifdef DRV_GBM_MESA
+static bool drv_device_has_render_node(int fd)
+{
+	drmDevicePtr dev = NULL;
+	bool has_render = false;
+
+	if (!drmGetDevice2(fd, 0, &dev)) {
+		has_render = dev->available_nodes & (1 << DRM_NODE_RENDER);
+		drmFreeDevice(&dev);
+	}
+
+	return has_render;
+}
+#endif
+
 static const struct backend *drv_get_backend(int fd)
 {
 #ifdef DRV_GBM_MESA
@@ -162,11 +177,15 @@ static const struct backend *drv_get_backend(int fd)
 	}
 
 #ifdef DRV_GBM_MESA
-	// Fallback to gbm_mesa backend if mesa graphics is used
+	// Fallback to gbm_mesa backend if mesa graphics is used, and the device has a GPU to use
 	propval = drv_get_os_option("ro.hardware.egl");
 	graphics_is_mesa |= propval && !strcmp(propval, "mesa");
 	propval = drv_get_os_option("ro.hardware.vulkan");
 	graphics_is_mesa |= propval && strcmp(propval, "pastel");
+	if (graphics_is_mesa && fd >= 0 && !drv_device_has_render_node(fd)) {
+		/* A display only device, the rendering is in software and the dumb buffers do */
+		graphics_is_mesa = false;
+	}
 	if (graphics_is_mesa) {
 		drv_loge("no matching backend, using gbm_mesa backend as fallback\n");
 		if (fd >= 0)
