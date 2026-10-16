@@ -39,6 +39,7 @@ filegroup {
         "amdgpu.c",
         "backend_mock.c",
         "dma_heap.c",
+        "dri_gbm.c",
         "drv.c",
         "drv_array_helpers.c",
         "drv_helpers.c",
@@ -78,6 +79,10 @@ filegroup {
     srcs: ["cros_gralloc/gralloc0/gralloc0.cc"],
 }
 
+// amdgpu.c with dri_gbm.c: Mesa's libgbm (libgbm_mesa.so) allocates tiled buffers, linear-only
+// when it is absent. The backend only binds to "amdgpu" DRM devices, so other GPUs are unaffected.
+amdgpu_cflags = ["-DDRV_AMDGPU"]
+
 gbm_mesa_cflags = [
     "-DDRV_GBM_MESA",
     "-DHAS_DMABUF_SYSTEM_HEAP",
@@ -104,9 +109,9 @@ vc4_cflags = ["-DDRV_VC4"]
 vmwgfx_cflags = ["-DDRV_VMWGFX"]
 
 // gbm_mesa is excluded, as it requires more configuration
-all_cflags = generic_cflags + intel_cflags + meson_cflags + msm_cflags + mediatek_cflags + vc4_cflags + vmwgfx_cflags
+all_cflags = amdgpu_cflags + generic_cflags + intel_cflags + meson_cflags + msm_cflags + mediatek_cflags + vc4_cflags + vmwgfx_cflags
 all_arm_cflags = generic_cflags + meson_cflags + msm_cflags + mediatek_cflags + vc4_cflags + vmwgfx_cflags
-all_x86_cflags = generic_cflags + intel_cflags + vmwgfx_cflags
+all_x86_cflags = amdgpu_cflags + generic_cflags + intel_cflags + vmwgfx_cflags
 
 cc_defaults {
     name: "minigbm_defaults_upstream",
@@ -124,6 +129,7 @@ cc_defaults {
         "all": all_cflags,
         "all_arm": all_arm_cflags,
         "all_x86": all_x86_cflags,
+        "amdgpu": amdgpu_cflags,
         "generic": generic_cflags,
         "intel": intel_cflags,
         "meson": meson_cflags,
@@ -141,6 +147,9 @@ cc_defaults {
         true: gbm_mesa_cflags,
         default: [],
     }),
+
+    // amdgpu.h (AMDGPU_TIMEOUT_INFINITE); libdrm_amdgpu itself is not linked.
+    include_dirs: ["external/libdrm-upstream/amdgpu"],
 
     product_variables: {
         platform_sdk_version: {

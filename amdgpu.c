@@ -387,12 +387,10 @@ static int amdgpu_init(struct driver *drv)
 		return -ENODEV;
 	}
 
+	/* Without a DRI (or GBM, see dri_gbm.c) allocator, buffers are linear only. */
 	priv->dri = dri_init(drv, DRI_PATH, "radeonsi");
-	if (!priv->dri) {
-		free(priv);
-		drv->priv = NULL;
-		return -ENODEV;
-	}
+	if (!priv->dri)
+		drv_logi("amdgpu: no DRI allocator, linear buffers only\n");
 
 	/* Continue on failure, as we can still succesfully map things without SDMA. */
 	if (sdma_init(priv, drv_get_fd(drv)))
@@ -443,6 +441,9 @@ static int amdgpu_init(struct driver *drv)
 			       BO_USE_CAMERA_READ | BO_USE_CAMERA_WRITE | BO_USE_HW_VIDEO_DECODER |
 				   BO_USE_HW_VIDEO_ENCODER | BO_USE_GPU_DATA_BUFFER |
 				   BO_USE_SENSOR_DIRECT_DATA);
+
+	if (!priv->dri)
+		return 0;
 
 	/*
 	 * The following formats will be allocated by the DRI backend and may be potentially tiled.
