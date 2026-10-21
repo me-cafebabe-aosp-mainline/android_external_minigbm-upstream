@@ -310,6 +310,62 @@ static int msm_init(struct driver *drv)
 	return 0;
 }
 
+/*
+ * Buffers that the CPU reads often (e.g. software video encoders reading the
+ * output of SurfaceFlinger) must be cached: reads from write-combined
+ * mappings are uncached and several orders of magnitude slower.  The msm
+ * kernel driver does no cache maintenance for MSM_BO_CACHED objects on
+ * non-coherent GPUs, so msm_bo_invalidate/msm_bo_flush do it from userspace.
+ */
+static bool msm_use_cached(uint64_t use_flags)
+{
+#if defined(__aarch64__)
+	return !!(use_flags & BO_USE_SW_READ_OFTEN);
+#else
+	return false;
+#endif
+}
+
+#if defined(__aarch64__)
+static int msm_cache_op(struct mapping *mapping)
+{
+	uint64_t ctr, line;
+	uintptr_t addr, end;
+
+	__asm__ volatile("mrs %0, ctr_el0" : "=r"(ctr));
+	line = 4ull << ((ctr >> 16) & 0xf);
+
+	addr = (uintptr_t)mapping->vma->addr & ~(uintptr_t)(line - 1);
+	end = (uintptr_t)mapping->vma->addr + mapping->vma->length;
+
+	/* Clean and invalidate to the point of coherency. */
+	__asm__ volatile("dsb ish" ::: "memory");
+	for (; addr < end; addr += line)
+		__asm__ volatile("dc civac, %0" ::"r"(addr) : "memory");
+	__asm__ volatile("dsb ish" ::: "memory");
+	return 0;
+}
+#else
+static int msm_cache_op(struct mapping *mapping)
+{
+	return 0;
+}
+#endif
+
+static int msm_bo_invalidate(struct bo *bo, struct mapping *mapping)
+{
+	if (!msm_use_cached(bo->meta.use_flags))
+		return 0;
+	return msm_cache_op(mapping);
+}
+
+static int msm_bo_flush(struct bo *bo, struct mapping *mapping)
+{
+	if (!msm_use_cached(bo->meta.use_flags))
+		return drv_bo_unmap(bo, mapping);
+	return msm_cache_op(mapping);
+}
+
 static int msm_bo_create_for_modifier(struct bo *bo, uint32_t width, uint32_t height,
 				      uint32_t format, const uint64_t modifier)
 {
@@ -319,7 +375,8 @@ static int msm_bo_create_for_modifier(struct bo *bo, uint32_t width, uint32_t he
 	bo->meta.tiling = (modifier == DRM_FORMAT_MOD_QCOM_COMPRESSED) ? MSM_UBWC_TILING : 0;
 	msm_calculate_layout(bo);
 
-	req.flags = MSM_BO_WC | MSM_BO_SCANOUT;
+	req.flags = msm_use_cached(bo->meta.use_flags) ? MSM_BO_CACHED : (MSM_BO_WC | MSM_BO_SCANOUT);
+	bo->meta.cached = !!(req.flags & MSM_BO_CACHED);
 	req.size = bo->meta.total_size;
 
 	ret = drmIoctl(bo->drv->fd, DRM_IOCTL_MSM_GEM_NEW, &req);
@@ -395,6 +452,8 @@ const struct backend backend_msm = {
 	.bo_export = drv_prime_bo_export,
 	.bo_map = msm_bo_map,
 	.bo_unmap = drv_bo_munmap,
+	.bo_invalidate = msm_bo_invalidate,
+	.bo_flush = msm_bo_flush,
 	.resolve_format_and_use_flags = drv_resolve_format_and_use_flags_helper,
 };
 #endif /* DRV_MSM */
